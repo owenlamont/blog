@@ -4,8 +4,10 @@ title: About Me
 permalink: /about/
 ---
 
-This website is powered by **[fastpages](https://github.com/fastai/fastpages)** [^1].
+![]({{ site.baseurl }}/images/Owen.png)
 
+I'm a data scientist and former developer with a love for coding, data visualisation, analysis, and machine learning. I'm particularly interested in the intersection of computer graphics and machine learning as I can see so much exciting development and progress happening in that space.
 
+Python is my go to language these days, I love the community and richness of its ecosystem. Would love to play with some Rust too but haven't found a good reason to use it yet.
 
-[^1]:a blogging platform that natively supports Jupyter notebooks in addition to other formats.
+I'm looking for an outlet to share cool stuff that falls within my interests (an awesome list of sorts) but hopefully also share tricks and tips for coding, graphics, and data analysis on the way and connect with the community of other developers, data scientists, or data analysts working in this space.
