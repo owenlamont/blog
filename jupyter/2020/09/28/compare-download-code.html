@@ -4,19 +4,19 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>Comparison of different download and save approaches in Python | Owen Lamont</title>
+<title>Different download and save approaches in Python | Owen Lamont</title>
 <meta name="generator" content="Jekyll v4.1.1" />
-<meta property="og:title" content="Comparison of different download and save approaches in Python" />
+<meta property="og:title" content="Different download and save approaches in Python" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Tips and tricks for working in the PyData ecosystem" />
-<meta property="og:description" content="Tips and tricks for working in the PyData ecosystem" />
-<link rel="canonical" href="https://owenlamont.github.io/blog/2020/09/28/compare-download-code.html" />
-<meta property="og:url" content="https://owenlamont.github.io/blog/2020/09/28/compare-download-code.html" />
+<meta name="description" content="A comparison of synchronous, multiprocess, and async approaches to downloading and saving files" />
+<meta property="og:description" content="A comparison of synchronous, multiprocess, and async approaches to downloading and saving files" />
+<link rel="canonical" href="https://owenlamont.github.io/blog/jupyter/2020/09/28/compare-download-code.html" />
+<meta property="og:url" content="https://owenlamont.github.io/blog/jupyter/2020/09/28/compare-download-code.html" />
 <meta property="og:site_name" content="Owen Lamont" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-09-28T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"Tips and tricks for working in the PyData ecosystem","url":"https://owenlamont.github.io/blog/2020/09/28/compare-download-code.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://owenlamont.github.io/blog/2020/09/28/compare-download-code.html"},"headline":"Comparison of different download and save approaches in Python","dateModified":"2020-09-28T00:00:00-05:00","datePublished":"2020-09-28T00:00:00-05:00","@context":"https://schema.org"}</script>
+{"description":"A comparison of synchronous, multiprocess, and async approaches to downloading and saving files","url":"https://owenlamont.github.io/blog/jupyter/2020/09/28/compare-download-code.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://owenlamont.github.io/blog/jupyter/2020/09/28/compare-download-code.html"},"headline":"Different download and save approaches in Python","dateModified":"2020-09-28T00:00:00-05:00","datePublished":"2020-09-28T00:00:00-05:00","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://owenlamont.github.io/blog/feed.xml" title="Owen Lamont" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
 <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
@@ -71,16 +71,23 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Comparison of different download and save approaches in Python</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-09-28T00:00:00-05:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">Different download and save approaches in Python</h1><p class="page-description">A comparison of synchronous, multiprocess, and async approaches to downloading and saving files</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-09-28T00:00:00-05:00" itemprop="datePublished">
         Sep 28, 2020
       </time>
        • <span class="read-time" title="Estimated read time">
     
     
-      2 min read
+      1 min read
     
 </span></p>
 
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#jupyter">jupyter</a>
+        
+      
+      </p>
     
 
     
@@ -108,7 +115,13 @@ window.onload = wrap_img;
       </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <!--
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Requirements">Requirements </a></li>
+<li class="toc-entry toc-h2"><a href="#Prepare-a-list-of-CSV-files-to-download">Prepare a list of CSV files to download </a></li>
+<li class="toc-entry toc-h2"><a href="#Download-15-csv-files-synchronously">Download 15 csv files synchronously </a></li>
+<li class="toc-entry toc-h2"><a href="#Download-15-csv-files-in-parallel-processes-using-all-available-cores">Download 15 csv files in parallel processes using all available cores </a></li>
+<li class="toc-entry toc-h2"><a href="#Download-15-csv-files-asynchronously-using-async-and-await-libraries">Download 15 csv files asynchronously using async and await libraries </a></li>
+</ul><!--
 #################################################
 ### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
 #################################################
@@ -117,7 +130,8 @@ window.onload = wrap_img;
 
 <div class="container" id="notebook-container">
         
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In this example I wanted to demonstrate the big differences in times between downloading files synchronously, in parallel processes, and asynchronously using async and await packages. The results shown here were run on my laptop using a Intel® Core™ i9-9980HK CPU @ 2.40GHz × 16 processor. I download 15 CSV files totalling about 26.7 megabytes at the time of writing.</p>
 <p>I expect the results to change significantly based on the number and size of the files but I think this nicely demonstrates for a relatively small number of largish files async performs better (slightly) than multi-process which and both are significantly faster than sequential downloading.</p>
@@ -125,9 +139,12 @@ window.onload = wrap_img;
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Get-required-packages-(if-not-already-in-environment)---assumes-conda-env">Get required packages (if not already in environment) - assumes conda env<a class="anchor-link" href="#Get-required-packages-(if-not-already-in-environment)---assumes-conda-env"> </a></h2>
+<h2 id="Requirements">
+<a class="anchor" href="#Requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements<a class="anchor-link" href="#Requirements"> </a>
+</h2>
 </div>
 </div>
 </div>
@@ -149,9 +166,12 @@ conda install -c conda-forge -y <span class="nv">aiofiles</span><span class="o">
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Prepare-a-list-of-CSV-files-to-download">Prepare a list of CSV files to download<a class="anchor-link" href="#Prepare-a-list-of-CSV-files-to-download"> </a></h2>
+<h2 id="Prepare-a-list-of-CSV-files-to-download">
+<a class="anchor" href="#Prepare-a-list-of-CSV-files-to-download" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prepare a list of CSV files to download<a class="anchor-link" href="#Prepare-a-list-of-CSV-files-to-download"> </a>
+</h2>
 </div>
 </div>
 </div>
@@ -162,7 +182,7 @@ conda install -c conda-forge -y <span class="nv">aiofiles</span><span class="o">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">file_url_list</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;http://data.wa.aemo.com.au/datafiles/load-summary/load-summary-</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.csv&quot;</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2006</span><span class="p">,</span> <span class="mi">2021</span><span class="p">)]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">file_url_list</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"http://data.wa.aemo.com.au/datafiles/load-summary/load-summary-</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.csv"</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2006</span><span class="p">,</span> <span class="mi">2021</span><span class="p">)]</span>
 </pre></div>
 
     </div>
@@ -172,9 +192,12 @@ conda install -c conda-forge -y <span class="nv">aiofiles</span><span class="o">
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Download-15-csv-files-synchronously">Download 15 csv files synchronously<a class="anchor-link" href="#Download-15-csv-files-synchronously"> </a></h2>
+<h2 id="Download-15-csv-files-synchronously">
+<a class="anchor" href="#Download-15-csv-files-synchronously" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download 15 csv files synchronously<a class="anchor-link" href="#Download-15-csv-files-synchronously"> </a>
+</h2>
 </div>
 </div>
 </div>
@@ -205,8 +228,8 @@ conda install -c conda-forge -y <span class="nv">aiofiles</span><span class="o">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">read_load_summary</span><span class="p">(</span><span class="n">file_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
-        <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 </pre></div>
 
@@ -251,9 +274,12 @@ Wall time: 1min 21s
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Download-15-csv-files-in-parallel-processes-using-all-available-cores">Download 15 csv files in parallel processes using all available cores<a class="anchor-link" href="#Download-15-csv-files-in-parallel-processes-using-all-available-cores"> </a></h2>
+<h2 id="Download-15-csv-files-in-parallel-processes-using-all-available-cores">
+<a class="anchor" href="#Download-15-csv-files-in-parallel-processes-using-all-available-cores" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download 15 csv files in parallel processes using all available cores<a class="anchor-link" href="#Download-15-csv-files-in-parallel-processes-using-all-available-cores"> </a>
+</h2>
 </div>
 </div>
 </div>
@@ -283,7 +309,7 @@ Wall time: 1min 21s
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
 <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">read_load_summary</span><span class="p">)(</span><span class="n">file_url</span><span class="p">)</span> <span class="k">for</span> <span class="n">file_url</span> <span class="ow">in</span> <span class="n">file_url_list</span><span class="p">)</span>
-<span class="k">pass</span> <span class="c1"># pass just so Jupyter doesn&#39;t show the list of null returns from Parallel</span>
+<span class="k">pass</span> <span class="c1"># pass just so Jupyter doesn't show the list of null returns from Parallel</span>
 </pre></div>
 
     </div>
@@ -308,9 +334,12 @@ Wall time: 8.45 s
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Download-15-csv-files-asynchronously-using-async-and-await-libraries">Download 15 csv files asynchronously using async and await libraries<a class="anchor-link" href="#Download-15-csv-files-asynchronously-using-async-and-await-libraries"> </a></h2>
+<h2 id="Download-15-csv-files-asynchronously-using-async-and-await-libraries">
+<a class="anchor" href="#Download-15-csv-files-asynchronously-using-async-and-await-libraries" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download 15 csv files asynchronously using async and await libraries<a class="anchor-link" href="#Download-15-csv-files-asynchronously-using-async-and-await-libraries"> </a>
+</h2>
 </div>
 </div>
 </div>
@@ -344,15 +373,15 @@ Wall time: 8.45 s
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">async</span> <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">,</span> <span class="n">file_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
-        <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="k">await</span> <span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
 
 
 <span class="k">async</span> <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">file_url_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-        <span class="c1"># If downloading a very large number of files you&#39;d probably need to limit</span>
+        <span class="c1"># If downloading a very large number of files you'd probably need to limit</span>
         <span class="c1"># the number of concurrent requests that could be sent at once</span>
         <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">fetch</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">file_url</span><span class="p">)</span> <span class="k">for</span> <span class="n">file_url</span> <span class="ow">in</span> <span class="n">file_url_list</span><span class="p">]</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
@@ -376,7 +405,7 @@ Wall time: 8.45 s
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="k">await</span> <span class="n">download</span><span class="p">(</span><span class="n">file_url_list</span><span class="p">)</span>
 <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wall time: </span><span class="si">{</span><span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span><span class="si">:</span><span class="s2">0.2</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Wall time: </span><span class="si">{</span><span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span><span class="si">:</span><span class="s2">0.2</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
 <span class="c1"># Using time functions since %%time magic errors when used in a cell with await</span>
 </pre></div>
 
@@ -405,7 +434,7 @@ Wall time: 8.45 s
 
 
 
-  </div><a class="u-url" href="/blog/2020/09/28/compare-download-code.html" hidden></a>
+  </div><a class="u-url" href="/blog/jupyter/2020/09/28/compare-download-code.html" hidden></a>
 </article>
       </div>
     </main><footer class="site-footer h-card">
