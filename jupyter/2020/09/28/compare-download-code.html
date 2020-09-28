@@ -77,7 +77,7 @@ window.onload = wrap_img;
        • <span class="read-time" title="Estimated read time">
     
     
-      1 min read
+      2 min read
     
 </span></p>
 
@@ -116,7 +116,8 @@ window.onload = wrap_img;
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul class="section-nav">
-<li class="toc-entry toc-h2"><a href="#Requirements">Requirements </a></li>
+<li class="toc-entry toc-h2"><a href="#Requirements-(Conda)">Requirements (Conda) </a></li>
+<li class="toc-entry toc-h2"><a href="#Requirements-(Pip)">Requirements (Pip) </a></li>
 <li class="toc-entry toc-h2"><a href="#Prepare-a-list-of-CSV-files-to-download">Prepare a list of CSV files to download </a></li>
 <li class="toc-entry toc-h2"><a href="#Download-15-csv-files-synchronously">Download 15 csv files synchronously </a></li>
 <li class="toc-entry toc-h2"><a href="#Download-15-csv-files-in-parallel-processes-using-all-available-cores">Download 15 csv files in parallel processes using all available cores </a></li>
@@ -142,8 +143,8 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Requirements">
-<a class="anchor" href="#Requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements<a class="anchor-link" href="#Requirements"> </a>
+<h2 id="Requirements-(Conda)">
+<a class="anchor" href="#Requirements-(Conda)" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements (Conda)<a class="anchor-link" href="#Requirements-(Conda)"> </a>
 </h2>
 </div>
 </div>
@@ -155,8 +156,33 @@ window.onload = wrap_img;
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span>%%sh
-conda install -c conda-forge -y <span class="nv">aiofiles</span><span class="o">=</span><span class="m">0</span>.5 <span class="nv">aiohttp</span><span class="o">=</span><span class="m">3</span>.6 <span class="nv">joblib</span><span class="o">=</span><span class="m">0</span>.16 <span class="nv">requests</span><span class="o">=</span><span class="m">2</span>.24
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">conda</span> install -c conda-forge -y aiofiles=0.5 aiohttp=3.6 joblib=0.16 requests=2.24
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Requirements-(Pip)">
+<a class="anchor" href="#Requirements-(Pip)" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements (Pip)<a class="anchor-link" href="#Requirements-(Pip)"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">pip</span> install aiofiles==0.5 aiohttp==3.6 joblib==0.16 requests==2.24
 </pre></div>
 
     </div>
